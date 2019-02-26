@@ -30,3 +30,8 @@
 *.exe
 *.out
 *.app
+
+# No need Files
+*.vcxproj
+*.vcxproj.user
+x64
