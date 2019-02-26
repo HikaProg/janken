@@ -34,3 +34,8 @@
 # No need Files
 Debug
 x64
+pch
+*.tlog
+*.idb
+*.pdb
+*.ilk
