@@ -32,6 +32,5 @@
 *.app
 
 # No need Files
-*.vcxproj
-*.vcxproj.user
+Debug
 x64
