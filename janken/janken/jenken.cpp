@@ -39,13 +39,13 @@ struct Janken
 
 struct Rand
 {
+	bool flag;
 	int GetRandom(int min, int max)
 	{
-		static int flag;
-		if (flag == 0)
+		if (!flag)
 		{
 			srand((unsigned int)time(NULL));
-			flag = 1;
+			flag = true;
 		}
 		return min + (int)rand()*(max - min + 1.0) / (1.0 + RAND_MAX);
 	}
@@ -97,7 +97,7 @@ int main()
 		}
 		Rand rnd;
 		// PCの結果
-		int pcHandNum = rnd.GetRandom(0, 2);
+		int pcHandNum = rnd.GetRandom(GUU, PAA);
 		cout << "PCは" << hand[pcHandNum].myHandStr.c_str() << "です。\n";
 		myHandNum = myHandNum - 1;
 		string judge;
