@@ -73,9 +73,9 @@ struct Result
 int main()
 {
 	Janken hand[JANKEN_TYPEMAX];
-	hand[0].Init("グー", "チョキ", "パー");
-	hand[1].Init("チョキ", "パー", "グー");
-	hand[2].Init("パー", "グー", "チョキ");
+	hand[GUU].Init("グー", "チョキ", "パー");
+	hand[TYOKI].Init("チョキ", "パー", "グー");
+	hand[PAA].Init("パー", "グー", "チョキ");
 
 	char userHand[256];
 	// 戦績
