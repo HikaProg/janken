@@ -2,6 +2,7 @@
 #include <random>
 #include <iostream>
 #include <time.h>
+#include <map>
 using namespace std;
 
 	enum JANKENTYPE
@@ -14,27 +15,17 @@ using namespace std;
 
 struct Janken
 {
-	void Init(string myHand, string winHand, string loseHand)
+	Janken();
+	Janken(JANKENTYPE myHand, JANKENTYPE winHand, JANKENTYPE loseHand, string myHandStr)
 	{
-		myHandStr += myHand;
-		winHandStr += winHand;
-		loseHandStr += loseHand;
+		m_myHandStr = myHandStr;
+		judgeInfo[(int)myHand] = "引き分け";
+		judgeInfo[(int)winHand] = "勝ち";
+		judgeInfo[(int)loseHand] = "負け";
 	}
-	string myHandStr = "";
-	string winHandStr = "";
-	string loseHandStr = "";
-	string WinJudgeHand(string hand)
-	{
-		return ((hand == winHandStr) ? "勝ち！" : "");
-	}
-	string LoseJudgeHand(string hand)
-	{
-		return ((hand == loseHandStr) ? "負け..." : "");
-	}
-	string DrawJudgeHand(string hand)
-	{
-		return ((hand == myHandStr) ? "引き分け" : "");
-	}
+public:
+	map<int, string> judgeInfo;
+	string m_myHandStr;
 };
 
 struct Rand
@@ -72,10 +63,10 @@ struct Result
 
 int main()
 {
-	Janken hand[JANKEN_TYPEMAX];
-	hand[GUU].Init("グー", "チョキ", "パー");
-	hand[TYOKI].Init("チョキ", "パー", "グー");
-	hand[PAA].Init("パー", "グー", "チョキ");
+	Janken *jankenHand[JANKEN_TYPEMAX];
+	jankenHand[GUU] = new Janken(GUU, TYOKI, PAA, "グー");
+	jankenHand[TYOKI] = new Janken(TYOKI, PAA, GUU, "チョキ");
+	jankenHand[PAA] = new Janken(PAA, GUU, TYOKI, "パー");
 
 	char userHand[256];
 	// 戦績
@@ -95,16 +86,14 @@ int main()
 				result.ShowResult();
 			continue;
 		}
+		myHandNum = myHandNum - 1;
 		Rand rnd;
 		// PCの結果
 		int pcHandNum = rnd.GetRandom(GUU, PAA);
-		cout << "PCは" << hand[pcHandNum].myHandStr.c_str() << "です。\n";
-		myHandNum = myHandNum - 1;
+		cout << "PCは" << jankenHand[pcHandNum]->m_myHandStr.c_str() << "です。\n";
 		string judge;
 		// 勝敗判定
-		judge += hand[myHandNum].DrawJudgeHand(hand[pcHandNum].myHandStr);
-		judge += hand[myHandNum].WinJudgeHand(hand[pcHandNum].myHandStr);
-		judge += hand[myHandNum].LoseJudgeHand(hand[pcHandNum].myHandStr);
+		judge = jankenHand[myHandNum]->judgeInfo[pcHandNum];
 		cout << "結果は" << judge.c_str() << "\n";
 		num++;
 		// リザルト保存
