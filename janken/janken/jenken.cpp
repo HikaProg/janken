@@ -24,7 +24,7 @@ using namespace std;
 
 #define RESULT_INFOMAX 30
 
-struct JankenKind
+class JankenKind
 {
 public:
 	JankenKind();
@@ -34,9 +34,14 @@ public:
 		judgeInfo[(int)myHand] = "引き分け";
 		judgeInfo[(int)winHand] = "勝ち";
 		judgeInfo[(int)loseHand] = "負け";
+
+		judgeInfoType[(int)myHand] = DRAW;
+		judgeInfoType[(int)winHand] = WIN;
+		judgeInfoType[(int)loseHand] = LOSE;
 	}
 public:
 	map<int, string> judgeInfo;
+	map<int, int> judgeInfoType;
 	string m_myHandStr;
 };
 
@@ -68,11 +73,10 @@ private:
 
 struct Rand
 {
-	bool flag;
 	int GetRandom(int min, int max)
 	{
-		std::random_device rnd;
-		std::mt19937_64 mt(rnd());
+		std::random_device randomSeed;
+		std::mt19937_64 mt(randomSeed());
 		std::uniform_int_distribution<> randRange(min, max);
 		return randRange(mt);
 	}
@@ -83,9 +87,10 @@ class Result
 {
 public:
 	Result() {
-		m_resultType["勝ち"] = WIN;
-		m_resultType["負け"] = LOSE;
-		m_resultType["引き分け"] = DRAW;
+		m_resultType[WIN] = "勝ち";
+		m_resultType[LOSE] = "負け";
+		m_resultType[DRAW] = "引き分け";
+		m_resultLimitCheck[RESULT_INFOMAX - 1] = 1;
 	}
 	~Result();
 	void Init(int num)
@@ -93,11 +98,10 @@ public:
 		m_minNum = num;
 	}
 	// リザルトの追加
-	void AddResult(int num, string _result)
+	void AddResult(int num, int _resultType)
 	{
-		m_results[num] = _result;
-		int resultType = m_resultType[_result];
-		m_resultsDetail[resultType]++;
+		m_results[num] = _resultType;
+		m_resultsDetail[_resultType]++;
 		m_maxNum = m_results.size() + m_minNum;
 	}
 	// リザルトの表示
@@ -105,7 +109,9 @@ public:
 	{
 		for (int i = m_minNum; i < m_maxNum; i++)
 		{
-			cout << i + 1 << "戦目" << m_results[i].c_str() << "\n";
+			int resultType = m_results[i];
+			auto result = m_resultType[resultType];
+			cout << i + 1 << "戦目" << result.c_str() << "\n";
 		}
 	}
 	void ShowResults()
@@ -115,10 +121,12 @@ public:
 		int d = m_resultsDetail[DRAW];
 		cout << "勝ち:" << w << "," << "負け:" << l << "," << "引き分け" << d << "\n";
 	}
+public:
 private:
-	map<int, string> m_results;
+	map<int, int> m_results;
 	int m_resultsDetail[RESULT_TYPEMAX];
-	map<string, int> m_resultType;
+	map<int, string> m_resultType;
+	int m_resultLimitCheck[RESULT_INFOMAX];
 	int m_minNum;
 	int m_maxNum;
 };
@@ -160,7 +168,7 @@ int main()
 		}
 		myHandNum = myHandNum - 1;
 		// PCの結果
-		pcHandNum = rnd.GetRandom(GUU, PAA);
+		pcHandNum = rnd.GetRandom(GUU,PAA);
 		// じゃんけんの手を設定
 		user->SetMyHand(jankenHand[myHandNum]);
 		pc->SetMyHand(jankenHand[pcHandNum]);
@@ -171,7 +179,7 @@ int main()
 		cout << "結果は" << judge.c_str() << "\n";
 
 		// リザルト保存
-		result->AddResult(num, judge);
+		result->AddResult(num, user->GetMyHand()->judgeInfoType[pcHandNum]);
 		// 戦績表示
 		result->ShowResults();
 		num++;
