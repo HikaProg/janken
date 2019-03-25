@@ -4,6 +4,7 @@
 #include <time.h>
 #include <map>
 #include <stdio.h>
+#include <algorithm>
 using namespace std;
 
 	enum JANKENTYPE
@@ -22,7 +23,7 @@ using namespace std;
 		RESULT_TYPEMAX,
 	};
 
-#define RESULT_INFOMAX 30
+#define RESULT_INFOMAX 5
 
 class JankenKind
 {
@@ -85,17 +86,24 @@ struct Rand
 
 class Result
 {
+private:
+	int NowResultCount(int num)
+	{
+		int count = num;
+		count -= m_resultLimitCont;
+		count = std::clamp(count, m_minNum, m_minNum + (m_resultLimitCont - 1));
+		return  count;
+	}
 public:
 	Result() {
 		m_resultType[WIN] = "勝ち";
 		m_resultType[LOSE] = "負け";
 		m_resultType[DRAW] = "引き分け";
-		m_resultLimitCheck[RESULT_INFOMAX - 1] = 1;
 	}
 	~Result();
 	void Init(int num)
 	{
-		m_minNum = num;
+		m_minNum = NowResultCount(num);
 	}
 	// リザルトの追加
 	void AddResult(int num, int _resultType)
@@ -121,14 +129,14 @@ public:
 		int d = m_resultsDetail[DRAW];
 		cout << "勝ち:" << w << "," << "負け:" << l << "," << "引き分け" << d << "\n";
 	}
-public:
 private:
 	map<int, int> m_results;
 	int m_resultsDetail[RESULT_TYPEMAX];
 	map<int, string> m_resultType;
-	int m_resultLimitCheck[RESULT_INFOMAX];
+	const int m_resultLimitCont = RESULT_INFOMAX;
 	int m_minNum;
 	int m_maxNum;
+	int m_ResultLimitArrival;
 };
 
 int main()
@@ -161,8 +169,9 @@ int main()
 			cout << "1:グー, 2:チョキ, 3:パー以外は戦績につきません。\n";
 			if (strcmp(userHand, "R") == 0)
 			{
-				result->ShowResultsDetail();
+				// リザルトの初期化
 				result->Init(num);
+				result->ShowResultsDetail();
 			}
 			continue;
 		}
