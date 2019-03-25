@@ -23,7 +23,7 @@ using namespace std;
 		RESULT_TYPEMAX,
 	};
 
-#define RESULT_INFOMAX 5
+#define RESULT_INFOMAX 10
 
 class JankenKind
 {
